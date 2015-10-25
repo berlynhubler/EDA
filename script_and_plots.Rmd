@@ -78,15 +78,49 @@ dev.off()
 Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
 
 ```{r, echo=FALSE}
+library(ggplot2)
+library(dplyr)
 # read data
 
-#NEI <- readRDS("./exdata-data-NEI_data/summarySCC_PM25.rds")
+NEI <- readRDS("./exdata-data-NEI_data/summarySCC_PM25.rds")
+
+
+# subset the data for each year & fips == "24510"
+plot2_1999dat <- NEI[(NEI$year == 1999 & NEI$fips == "24510"), ]
+plot2_2002dat <- NEI[(NEI$year == 2002 & NEI$fips == "24510"), ]
+plot2_2005dat <- NEI[(NEI$year == 2005 & NEI$fips == "24510"), ]
+plot2_2008dat <- NEI[(NEI$year == 2008 & NEI$fips == "24510"), ]
 
 # subset the data for each source type
-# need a better system than this one....
+# probably a more efficient way to summarize this data....
 
-#plot3_1999dat <- NEI[(NEI$year == 1999 & NEI$type == "POINT"), ]
+# POINT
+point_1999 <- sum(plot2_1999dat[(plot2_1999dat$type == "POINT"),4])
+point_2002 <- sum(plot2_2002dat[(plot2_2002dat$type == "POINT"),4])
+point_2005 <- sum(plot2_2005dat[(plot2_2005dat$type == "POINT"),4])
+point_2008 <- sum(plot2_2002dat[(plot2_2008dat$type == "POINT"),4])
+POINT <- c(point_1999, point_2002, point_2005, point_2008)
 
+# NONPOINT
+nonpoint_1999 <- sum(plot2_1999dat[(plot2_1999dat$type == "NONPOINT"),4])
+nonpoint_2002 <- sum(plot2_2002dat[(plot2_2002dat$type == "NONPOINT"),4])
+nonpoint_2005 <- sum(plot2_2005dat[(plot2_2005dat$type == "NONPOINT"),4])
+nonpoint_2008 <- sum(plot2_2008dat[(plot2_2008dat$type == "NONPOINT"),4])
+nonPOINT <- c(nonpoint_1999, nonpoint_2002, nonpoint_2005,  nonpoint_2008)
+
+# ON-ROAD
+onroad_1999 <- sum(plot2_1999dat[(plot2_1999dat$type == "ON-ROAD"),4])
+onroad_2002 <- sum(plot2_2002dat[(plot2_2002dat$type == "ON-ROAD"),4])
+onroad_2005 <- sum(plot2_2005dat[(plot2_2005dat$type == "ON-ROAD"),4])
+onroad_2008 <- sum(plot2_2008dat[(plot2_2008dat$type == "ON-ROAD"),4])
+onROAD <- c(onroad_1999, onroad_2002, onroad_2005,  onroad_2008)
+
+# NON-ROAD
+nonroad_1999 <- sum(plot2_1999dat[(plot2_1999dat$type == "NON-ROAD"),4])
+nonroad_2002 <- sum(plot2_2002dat[(plot2_2002dat$type == "NON-ROAD"),4])
+nonroad_2005 <- sum(plot2_2005dat[(plot2_2005dat$type == "NON-ROAD"),4])
+nonroad_2008 <- sum(plot2_2008dat[(plot2_2008dat$type == "NON-ROAD"),4])
+nonROAD <- c(nonroad_1999, nonroad_2002, nonroad_2005,  nonroad_2008)
 
 # make a panel plot for each type (4 total)
 # 1. x = year, y = total emissions for POINT
@@ -94,8 +128,17 @@ Of the four types of sources indicated by the type (point, nonpoint, onroad, non
 # 3. x = year, y = total emissions for ON-ROAD
 # 4. x = year, y = total emissions for NON-ROAD
 
-#x <- c(1999, 2002, 2005, 2008)
-#y <- 
+# Data.frame should have headers: YEAR, TYPE, TOTAL.EMISSION
+
+YEARS <- c(1999, 2002, 2005, 2008)
+TYPE <- c("POINT", "NONPOINT", "ON-ROAD", "NON-ROAD")
+
+EM_DAT <- data.frame()
+for (i in 1:4) {
+     EM_DAT <- rbind(EM_DAT, cbind(YEARS[i], POINT[i], TYPE[1]), cbind(YEARS[i], nonPOINT[i], TYPE[2]), cbind(YEARS[i], onROAD[i], TYPE[3]), cbind(YEARS[i], nonROAD[i], TYPE[4]))
+}
+
+EM_DAT <- rename(EM_DAT, YEARS = V1, TOTAL.EMISSION = V2, TYPE = V3)
 
 # plot data using ggplot2
 #library(ggplot2)
